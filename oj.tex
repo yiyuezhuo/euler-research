@@ -25,7 +25,7 @@
 
 \begin{frame}
 
-\frametitle{What is online judge(oj)?}
+\frametitle{What is online judge(OJ)?}
 
 An online judge is an online system to test programs in programming contests. 
 They are also used to practice for such contests. Many of these systems organize their own contests.
@@ -42,7 +42,7 @@ execution time for a particular problem. \footnote{Wikipedia https://en.wikipedi
 \end{frame}
 
 \begin{frame}
-\frametitle{Euler project}
+\frametitle{Project Euler}
 \includegraphics[scale=0.55]{euler-oj.png}
 \end{frame}
 
@@ -60,10 +60,10 @@ execution time for a particular problem. \footnote{Wikipedia https://en.wikipedi
 \begin{frame}
 \frametitle{Some problem in Real world}
 
-The data listed on the list looks very interesting. These're a number of insights for user behavior which 
+The data listed on the table looks very interesting. These're a number of insights for user behavior which 
 can generalize to online education service. For example:
 
-Why number of solved sequence looks like this? If we provide online education product as same as those oj, 
+Why the sequence of number of solved looks like this? If we provide online education product as same as those oj, 
 and observe such series, does it mean our product fail or extra-success?
 
 \begin{figure}[h]
@@ -89,15 +89,14 @@ and observe such series, does it mean our product fail or extra-success?
 
 \frametitle{Identify}
 
-Is it signicant to put difficulty problem on the behind those easy problem 
-if we want keep our user happy and not be shocked by those monster? It make sense
+Is it signicant to put difficult problem on the behind those easy problem 
+if we want keep our user satisfactory and not be shocked by excess hard problem? It make sense
 for online education to maintain user interest in their study process. For technically speaking:
 According to data, do we observe the fact that a hard problem cause a temporary 
-or continued solved number decrease,
-although we have controlled other effect? 
-How do we control other effect to identify the shock from hard problem?
+or continued solved number decrease, although we have controlled other effect? 
 
-There's a regression have been run as baseline.
+How do we control other effect to identify the shock from hard problem? The econometric model might help, 
+following regression models have been run as baseline to lead to thee problem that we try to survey.
 
 \end{frame}
 
@@ -155,8 +154,9 @@ where $id_i$ is the id of problem $i$, $diff_i$ is difficulty measure given by P
 
 \begin{frame}
 
-We can see the estimated effect of diff is negative but not be signicant. The result does not adapt by theory,
-and DW statistic is too low which imply possibility that autocorrelation exist in model. 
+We can see the estimated effect of $diff$ is negative but not be signicant. 
+While the result does not adapt for theory,
+DW statistic is too low which imply possibility that autocorrelation exist in model. 
 Let we try to apply log transform on $solve$ to reduce the effect and to make estimated value more precise.
 
 \begin{figure}[h]
@@ -241,7 +241,7 @@ $diff\_hard_i=1$ if $diff > 50$,else $diff\_hard_i=0$.
 \frametitle{Model 3}
 
 $$
-\log(solve_i) = \beta_0 + \beta_1 id_i + \beta_2 diff_mid + \beta_3 + diff_hard + \epsilon_i
+\log(solve_i) = \beta_0 + \beta_1 id_i + \beta_2 diff\_mid + \beta_3 diff\_hard + \epsilon_i
 $$
 
 \begin{center}
@@ -290,7 +290,7 @@ $$
 \begin{frame}
 
 The DW statistic looks better than using $diff$ directly. But if we inspect the the plot of residual of model3, 
-the same pattern is weaken while there aren't fundamental change what we expect.
+the same pattern is weaken while there aren't fundamentally changed to what we expect.
 
 \begin{figure}[h]
 \includegraphics[width=0.5\textwidth, inner]{model3-resid.png}
@@ -301,19 +301,94 @@ the same pattern is weaken while there aren't fundamental change what we expect.
 
 \begin{frame}
 
-\frametitle{Why the residual pattern occur? The road to user personas. }
+\frametitle{What construct the residual pattern? The road to user personas. }
 
 Although we can run a segmented regression, but more fundamental origin is interesting to investigate.
 A idea to model this phenomenon is to try to decompose user into distinct groups
-who act differently in problem solving process. 
+who acts differently in problem solving process. 
 
 For example, the "light" user may solve first few problems and then leave while the "hard core" 
 user would try solve many problem until their interest wore off and nerd would like to solve prolbem
-labeled in hardest. 
-These effects are mixed and hard to distinguish if we only consider the infomation given by OJ website.
+labeled as hardest. 
 
-For example, the number of hit of chinese translation of description of origin problem is a variable relate 
-solved number. In fact, we can run a parallel model on hit data.
+How to esimate these latent factor? The solved sequence may be too weak to apply identification. 
+Fortunately, some extra-date have been collected for the goal.
+
+%These effects are mixed and hard to distinguish if we only consider the infomation given by OJ website.
+
+%For example, the number of hit of chinese translation of description of origin problem is a variable relate 
+%solved number. In fact, we can run a parallel model on hit data.
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Extended Data Structure and Cross Estimation}
+
+These's a chinese translation website that provide problem description translation for original problem.
+Obviously, the hit count of problem is a important factor to measure problem real difficulty taken by to compare 
+hit and solved number. Sadly, Project Euler dont't provide this measure directly, 
+but the hit prodived by translation post would be a nice proxy variable. Of course the method cause new problem.
+Someone may looks chinese translation post for their poor English(like me), 
+thus if we equally weight eveny posts, then the problem hard to read will be exaggerated on their difficulty estimated.
+Against this challenge, I collect the text length of description in both English(origin) and Chinese(translation) version,
+although the difficulty in readability but not problem may be caused by some vague statement or confusing grammar
+that can't be caught by text length.
+
+
+\end{frame}
+
+\begin{frame}
+
+If we assume that these OJ shares same user and their behavior distribution, 
+we can estimate these hidden parameters on a more horizon space, instead of only to observe one sequence 
+as the only one sample to model, and use data only not hold in one OJ but hold in other. For example, 
+as previous images, Project Euler doesn't include Acceptance index, but the two others does, hence we can use the two
+others index to fill Project Euler one. How excellent idea! Thanks internet prodive so many website which 
+provide same and distinct index from their "nature experiment". Big data equip us with these advanced tool
+to investigate world that hided in past.
+
+The current data structure looks like this:
+
+\begin{tabular}{lrrrrrrr}
+\toprule
+{} &  id &  content &  des\_len &  diff &    hit &   solve &  t\_content \\
+\midrule
+0 &   1 &      187 &       25 &     5 &  13792 &  537234 &         85 \\
+1 &   2 &      312 &       32 &     5 &   7571 &  438350 &        135 \\
+2 &   3 &      111 &       17 &     5 &   6364 &  317208 &         65 \\
+3 &   4 &      209 &       20 &     5 &   5414 &  285419 &        101 \\
+4 &   5 &      206 &       24 &     5 &   4627 &  297082 &         70 \\
+\bottomrule
+\end{tabular}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{The Power of Cross Estimation, A Example}
+
+Let's see a example about the power in cross estimation. The following is hit sequence, what made the abrupt decrease?
+Compare to original sequence, we can't see same pattern. For any reason, these's a change to run regression discontinuity
+to identify some effect that are hard to identify usually.
+
+\begin{figure}[h]
+ 
+\begin{subfigure}{0.45\textwidth}
+\includegraphics[width=0.9\linewidth, height=4cm]{hit-seq.png} 
+\caption{Hit number series}
+\label{fig:f1}
+\end{subfigure}
+\begin{subfigure}{0.45\textwidth}
+\includegraphics[width=0.9\linewidth, height=4cm]{solved-seq2.png}
+\caption{Log solved number series}
+\label{fig:f2}
+\end{subfigure}
+ 
+%\caption{Caption for this figure with two images}
+\label{fig:image2}
+\end{figure}
+
 
 \end{frame}
 
