@@ -27,11 +27,17 @@
 
 \frametitle{What is online judge(oj)?}
 
-An online judge is an online system to test programs in programming contests. They are also used to practice for such contests. Many of these systems organize their own contests.
+An online judge is an online system to test programs in programming contests. 
+They are also used to practice for such contests. Many of these systems organize their own contests.
 
-The system can compile and execute code, and test them with pre-constructed data. Submitted code may be run with restrictions, including time limit, memory limit, security restriction and so on. The output of the code will be captured by the system, and compared with the standard output. The system will then return the result. When mistakes were found in a standard output, rejudgement using the same method must be made.
+The system can compile and execute code, and test them with pre-constructed data. 
+Submitted code may be run with restrictions, including time limit, memory limit, security restriction and so on. 
+The output of the code will be captured by the system, and compared with the standard output. 
+The system will then return the result. When mistakes were found in a standard output, 
+rejudgement using the same method must be made.
 
-Online Judges have ranklists showing users with the biggest number of accepted solutions and shortest execution time for a particular problem. \footnote{Wikipedia https://en.wikipedia.org/wiki/Online\_judge}
+Online Judges have ranklists showing users with the biggest number of accepted solutions and shortest 
+execution time for a particular problem. \footnote{Wikipedia https://en.wikipedia.org/wiki/Online\_judge}
 
 \end{frame}
 
@@ -65,12 +71,12 @@ and observe such series, does it mean our product fail or extra-success?
 \begin{subfigure}{0.45\textwidth}
 \includegraphics[width=0.9\linewidth, height=4cm]{solved-seq1.png} 
 \caption{Solved number series}
-\label{fig:subim1}
+\label{fig:f1}
 \end{subfigure}
 \begin{subfigure}{0.45\textwidth}
 \includegraphics[width=0.9\linewidth, height=4cm]{solved-seq2.png}
 \caption{Log solved number series}
-\label{fig:subim2}
+\label{fig:f2}
 \end{subfigure}
  
 \caption{Caption for this figure with two images}
@@ -91,7 +97,7 @@ or continued solved number decrease,
 although we have controlled other effect? 
 How do we control other effect to identify the shock from hard problem?
 
-There's a baseline regression have been run to 
+There's a regression have been run as baseline.
 
 \end{frame}
 
@@ -156,6 +162,7 @@ Let we try to apply log transform on $solve$ to reduce the effect and to make es
 \begin{figure}[h]
 \includegraphics[width=0.5\textwidth, inner]{model1-resid.png}
 \caption{Plot of residuals of model 1}
+\label{fig:f3}
 \end{figure}
 
 \end{frame}
@@ -164,6 +171,8 @@ Let we try to apply log transform on $solve$ to reduce the effect and to make es
 
 \frametitle{Model 2}
 
+
+The only change of model 2 is that dependent variable $solve$ is transform to $log(solve)$.
 $$
 \log(solve_i) = \beta_0 + \beta_1 id_i + \beta_2 diff_i + \epsilon_i
 $$
@@ -222,8 +231,89 @@ $diff\_hard_i=1$ if $diff > 50$,else $diff\_hard_i=0$.
 \begin{figure}[h]
 \includegraphics[width=0.5\textwidth, inner]{model2-resid.png}
 \caption{Plot of residuals of model 2}
+\label{fig:f4}
 \end{figure}
 
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Model 3}
+
+$$
+\log(solve_i) = \beta_0 + \beta_1 id_i + \beta_2 diff_mid + \beta_3 + diff_hard + \epsilon_i
+$$
+
+\begin{center}
+\scalebox{0.5}[0.5]{
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &    log(solve)    & \textbf{  R-squared:         } &     0.907  \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.906  \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     841.8  \\
+\textbf{Date:}             & Tue, 11 Apr 2017 & \textbf{  Prob (F-statistic):} & 6.87e-133  \\
+\textbf{Time:}             &     14:38:30     & \textbf{  Log-Likelihood:    } &   -192.36  \\
+\textbf{No. Observations:} &         262      & \textbf{  AIC:               } &     392.7  \\
+\textbf{Df Residuals:}     &         258      & \textbf{  BIC:               } &     407.0  \\
+\textbf{Df Model:}         &           3      & \textbf{                     } &            \\
+\textbf{Covariance Type:}  &    nonrobust     & \textbf{                     } &            \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+}
+\scalebox{0.5}[0.5]{
+\begin{tabular}{lccccc}
+\toprule
+                           & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{Intercept}         &      11.2770  &        0.066     &   169.869  &         0.000        &        11.146    11.408       \\
+\textbf{diff\_mid[T.True]}  &      -1.0259  &        0.102     &   -10.088  &         0.000        &        -1.226    -0.826       \\
+\textbf{diff\_hard[T.True]} &      -0.6194  &        0.092     &    -6.731  &         0.000        &        -0.801    -0.438       \\
+\textbf{id}                &      -0.0124  &        0.001     &   -16.695  &         0.000        &        -0.014    -0.011       \\
+\bottomrule
+\end{tabular}
+}
+\scalebox{0.5}[0.5]{
+\begin{tabular}{lclc}
+\toprule
+\textbf{Omnibus:}       & 32.712 & \textbf{  Durbin-Watson:     } &    0.774  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &   45.065  \\
+\textbf{Skew:}          &  0.810 & \textbf{  Prob(JB):          } & 1.64e-10  \\
+\textbf{Kurtosis:}      &  4.225 & \textbf{  Cond. No.          } &     501.  \\
+\bottomrule
+\end{tabular}
+}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+
+The DW statistic looks better than using $diff$ directly. But if we inspect the the plot of residual of model3, 
+the same pattern is weaken while there aren't fundamental change what we expect.
+
+\begin{figure}[h]
+\includegraphics[width=0.5\textwidth, inner]{model3-resid.png}
+\caption{Plot of residuals of model 3}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Why the residual pattern occur? The road to user personas. }
+
+Although we can run a segmented regression, but more fundamental origin is interesting to investigate.
+A idea to model this phenomenon is to try to decompose user into distinct groups
+who act differently in problem solving process. 
+
+For example, the "light" user may solve first few problems and then leave while the "hard core" 
+user would try solve many problem until their interest wore off and nerd would like to solve prolbem
+labeled in hardest. 
+These effects are mixed and hard to distinguish if we only consider the infomation given by OJ website.
+
+For example, the number of hit of chinese translation of description of origin problem is a variable relate 
+solved number. In fact, we can run a parallel model on hit data.
 
 \end{frame}
 
