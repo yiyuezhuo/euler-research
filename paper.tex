@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{graphicx}
+\usepackage{amsmath}
 \graphicspath{{images/}}
 
 \title{The User Behavior On Online Judge Website}
@@ -28,6 +29,56 @@ in Internet except Leetcode. I have noticed the interesting data structure relat
 But I lacked enough powerful statistic tool to process and model it. 
 In fact, I model it as a ordinary least squard which is not understood by me in the time. In the naive period,
 linear regression model seems like a poor black box model that often be meeted in Machine Learning algorithm.
+
+Now, partly because of study of course of Econometric, I totally understand the random model and the instance,
+linear regression. 
+Right, there're some random variable constrained by expectation function sharing same parameters, that's all.
+A specific linear regression model correspond to many latent models specified indepent variable distribution,
+but their expectation function are same. This lead to same result from estimator and model test.
+
+My insight is given by some external user comment about their usage they use OJ. 
+Someone claim that thay solve problem by order of the number of solved, but I solve problem by order of ID.
+I'm fascinated by thinking that how to identify the percent of two type if we assume only the two type exists.
+Since the particular problem represent a more general problem set, I would like to treat it as a bridge to that.
+
+Let's formulate my ealiest idea, there're $N$ problems, $n$ solver. Let 
+$s_{ij} \in \{ 0,1 \} \quad i \in \{ 1,\dots,n \} \; j \in \{ 1,\dots,N \}$ be whether solver $i$ solve the problem $j$.
+So fixing solver $i$, we assume binary random vector $s_i = ( s_{i1} s_{i2} \dots s_{iN} )^T$ 
+can be divided into some group which is determined by a specific distribution and they're independent.
+Specially, I define the distribution $D_1$ which follow order of ID:
+
+
+\begin{align*} % Notice align or align* is not used in math mode. They can be directly include in paragraph(normal) mode.
+P(s_{i1} = 1) = p \\
+P(s_{ij} = 1 | s_{i,j-1}=0) = 0 \\
+P(s_{ij} = 1 | s_{i,j-1}=1) = p
+\end{align*}
+
+
+and define $D2$ which follow order of the number of solved:
+
+
+\begin{align*}
+P(s_{i,r(1)} = 1) &= p \\
+P(s_{i,r(j)} = 1 | s_{i,r(j-1)}=0) &= 0 \\
+P(s_{i,r(j)} = 1 | s_{i,r(j-1)}=1) &= p
+\end{align*}
+
+
+in which $r(i)$ is function that map the the rank of number of solved to id
+(e.g. r(10)=20 means that the rank of number of solved of 20th problem is 10).
+Obviously we can replace $r(i)$ to any onther order that mean some interesting thing to get other distribution.
+
+Let $n_1,n_2$ be the individual number that follows $D_1,D_2$, hence $n_1+n_2=n$. Unfortunately, we only can 
+observe the sum of every sample sequence:
+
+$$
+S_j = \sum_{i=1}^n s_{ij}
+$$ 
+
+Our data is only the a obseration of statistic $S_j$ exactly. It looks like:
+
+
 
 \section{Motivation}
 
