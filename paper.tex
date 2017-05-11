@@ -4,6 +4,9 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{amsmath,amssymb}
+\usepackage[export]{adjustbox}
+\usepackage{booktabs}
+%\usepackage{subcaption}
 \graphicspath{{images/}}
 
 \DeclareMathOperator*{\argmin}{arg\,min}
@@ -44,6 +47,8 @@ My insight is given by some external user comment about their usage they use OJ.
 Someone claim that thay solve problem by order of the number of solved, but I solve problem by order of ID.
 I'm fascinated by thinking that how to identify the percent of two type if we assume only the two type exists.
 Since the particular problem represent a more general problem set, I would like to treat it as a bridge to that.
+
+\section{The order model}
 
 Let's formulate my ealiest idea, there're $N$ problems, $n$ solver. Let 
 $s_{ij} \in \{ 0,1 \} \quad i \in \{ 1,\dots,n \} \; j \in \{ 1,\dots,N \}$ be whether solver $i$ solve the problem $j$.
@@ -152,36 +157,156 @@ minimize the objective function \footnote{Alrough I feel that this conversion is
 it assign different weights on every data point.}: 
 
 \[
-\min_{\hat{n},\hat{p}} \sum_{j=1}^N ( S_j - (\log(\hat{n}) + j \log(\hat{p})) )
+\min_{\hat{n},\hat{p}} \sum_{j=1}^N ( \log{S_j} - (\log(\hat{n}) + j \log(\hat{p})) )
 \]
 
-For the real data, the estimated results are:
+The OLS model is:
+
+\[
+S_j = \log(n) + \log(p) j + \epsilon_j
+\]
+
+The result estimated by OLS are:
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &    log(solve)    & \textbf{  R-squared:         } &     0.849   \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.849   \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     1466.   \\
+\textbf{Date:}             & Thu, 11 May 2017 & \textbf{  Prob (F-statistic):} & 7.30e-109   \\
+\textbf{Time:}             &     15:04:45     & \textbf{  Log-Likelihood:    } &   -255.98   \\
+\textbf{No. Observations:} &         262      & \textbf{  AIC:               } &     516.0   \\
+\textbf{Df Residuals:}     &         260      & \textbf{  BIC:               } &     523.1   \\
+\textbf{Df Model:}         &           1      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                   & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{Intercept} &      11.4630  &        0.080     &   143.363  &         0.000        &        11.306    11.620       \\
+\textbf{id}        &      -0.0202  &        0.001     &   -38.287  &         0.000        &        -0.021    -0.019       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 22.352 & \textbf{  Durbin-Watson:     } &    0.989  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &   25.530  \\
+\textbf{Skew:}          &  0.712 & \textbf{  Prob(JB):          } & 2.86e-06  \\
+\textbf{Kurtosis:}      &  3.558 & \textbf{  Cond. No.          } &     304.  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+Does it looks great? We have high $R^2$ and very significance on model and coefficient both. But if we compute 
+$\hat{p},\hat{n}$ from  estimated $\log{\hat{p}}, \log{\hat{n}}$ , we got:
 
 \[
 \hat{n} = 95132.76 \quad \hat{p} = 0.98002
 \]
 
 The $\hat{n}$ looks too small and $\hat{p}$ looks too big as we notice the quick fall of sequence head that
-can not be expressed the too small $\hat{p}$ as the fit graph illustrate:
+can not be caught by too small $\hat{p}$, as the fit graph illustrate:
 
 \includegraphics[scale=0.55]{simple-fit.png}
 
 Since the fitting is dominated by the tail data, the rift implies that our model is too weak to express 
 the mechanism behind the data.
 
-We can verify this by to regress data chunks separately, 
-obviousily if the model is true, $\hat{p}$ will only change little subject to random noise. 
-Below results are obtained by taken first $1/10$ data and last $9/10$ data separately:
+We also can verify this by running a piecewise regression:
 
 \[
-\hat{p_1} = 0.9275 \quad \hat{p_2} = 0.9824
+S_j = \log(n_1) +  \log(p_1) \mathrm{I}(j<K) j + \log(n_2) + \log(p_2) \mathrm{I}(j \ge K)j + \epsilon_j
 \]
 
-% Let us merge the two fitting result into a unique figure:
+The I(j<K) is indicative function, that take $1$ if the statement included in parenthesis is true otherwise take 0.
+
+Obviousily if the model is true, $\hat{p}$ will only change little subject to random noise. 
+Below results are obtained by taken first $1/10$ data and last $9/10$ data separately:
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &    log(solve)    & \textbf{  R-squared:         } &     0.887   \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.886   \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     677.2   \\
+\textbf{Date:}             & Thu, 11 May 2017 & \textbf{  Prob (F-statistic):} & 5.95e-122   \\
+\textbf{Time:}             &     22:17:31     & \textbf{  Log-Likelihood:    } &   -217.95   \\
+\textbf{No. Observations:} &         262      & \textbf{  AIC:               } &     443.9   \\
+\textbf{Df Residuals:}     &         258      & \textbf{  BIC:               } &     458.2   \\
+\textbf{Df Model:}         &           3      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+             & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{lC}  &      12.9522  &        0.231     &    56.072  &         0.000        &        12.497    13.407       \\
+\textbf{lid} &      -0.0741  &        0.016     &    -4.770  &         0.000        &        -0.105    -0.044       \\
+\textbf{rC}  &      11.0358  &        0.085     &   130.136  &         0.000        &        10.869    11.203       \\
+\textbf{rid} &      -0.0178  &        0.001     &   -33.447  &         0.000        &        -0.019    -0.017       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 27.715 & \textbf{  Durbin-Watson:     } &    1.318  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &   38.377  \\
+\textbf{Skew:}          &  0.699 & \textbf{  Prob(JB):          } & 4.64e-09  \\
+\textbf{Kurtosis:}      &  4.249 & \textbf{  Cond. No.          } & 1.01e+03  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+ 
+So we got:
+ 
+\[
+\hat{p_1} = 0.9285 \quad \hat{p_2} = 0.9823
+\]
+
+Let us show the two fitting figure:
+
+\begin{figure}[h]
+
+\centering
+
+\subfigure[Piecewise regression]{\includegraphics[width=0.49\linewidth]{bi-regress.png}}
+\subfigure[Log scale]{\includegraphics[width=0.49\linewidth]{bi-regress-log.png}}
+ 
+\end{figure}
+
+I can't torlerate the odd piecewise regression, although it fit data ok, but it seems to imply that the problem chunks
+adapt different mechanism. Perhaps it's true, but the dangrous of overfitting hidden behind can be achieved by 
+repeating piecewise process.
+
+Now, let's introduce my initialization idea, how does the two order mix model compare to the single id-order model?
+
+We do the optimization:
 
 
+\begin{align*}
+\min_{n_1,n_2,p} & \quad \E\sum_{j=1}^N (S_j - \hat{S_j})^2 \\
+\textrm{s.t.}    & \quad n_1 \in N \\
+                 & \quad n_2 \in N \\
+                 & \quad p \in [0,1]
+\end{align*}
+
+As you can image, I got very unsteady fitting result due to the similarity between the two orders, and it's analogous
+to multicolinearity. The data broke my ambition cruely. \footnote{I write the paper and experiment at same time,
+I found some result that is beyond my expectations. Since the the value of the paper is very limit and cost is too high
+(you see, my English is not very well), I will not pay more time to rewrite something.}
+
+\section{The time series view}
+
+Considering $S_j$ as time series looks little strange, since obviousily we are dealing a snapshot or intersect data
+that can be observed many times in principe \footnote{In fact, because data I used is scraped in 2016 by my early
+crawler program, I can get another(current time) data to run panel model or otherthing if I want to be. Well, 
+but I don't want pay time to work on another boring crawler program, although it conflict my early talk 
+in presentation.}.
 
 
+\section{Detecting effect of difficulty}
+
+Maybe it was putting cart before horse. My initialization idea tend to design probility model and reduce it to 
+OLS or other model
 
 \section{Motivation}
 
