@@ -219,7 +219,7 @@ We also can verify this by running a piecewise regression:
 S_j = \log(n_1) +  \log(p_1) \mathrm{I}(j<K) j + \log(n_2) + \log(p_2) \mathrm{I}(j \ge K)j + \epsilon_j
 \]
 
-The I(j<K) is indicative function, that take $1$ if the statement included in parenthesis is true otherwise take 0.
+The $I(j < K)$ is indicative function, that take $1$ if the statement included in parenthesis is true otherwise take 0.
 
 Obviousily if the model is true, $\hat{p}$ will only change little subject to random noise. 
 Below results are obtained by taken first $1/10$ data and last $9/10$ data separately:
@@ -296,20 +296,205 @@ I found some result that is beyond my expectations. Since the the value of the p
 
 \section{The time series view}
 
-Considering $S_j$ as time series looks little strange, since obviousily we are dealing a snapshot or intersect data
-that can be observed many times in principe \footnote{In fact, because data I used is scraped in 2016 by my early
-crawler program, I can get another(current time) data to run panel model or otherthing if I want to be. Well, 
-but I don't want pay time to work on another boring crawler program, although it conflict my early talk 
-in presentation.}.
+Considering $S_j$ as time series looks little strange, since obviousily we are dealing a snapshot or cross section 
+datathat can be observed many times in principe \footnote{In fact, because data I used is scraped in 2016 
+by my early crawler program, I can get another(current time) data to run panel model or otherthing 
+if I want to be. Well, but I don't want pay time to work on another boring crawler program, 
+although it conflict my early speaking in presentation.}.
+
+We will reduce our scope of discussion into autoregression in this section. Assurming there's a \textit{force}
+that is effected by \textit{time}(id order) and difficulty. Since the latter problem solving situation
+is only caused by few delay item, the difficulty will cause a permanent shock for solving series.
+
+\subsection{Ground model}
+
+The ground model specification is:
+
+\[
+solve_i = \beta_0 + \beta_1 solve_{i-1} + \epsilon_i
+\]
+
+The result is:
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &      solve       & \textbf{  R-squared:         } &     0.958   \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.958   \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     5951.   \\
+\textbf{Date:}             & Fri, 12 May 2017 & \textbf{  Prob (F-statistic):} & 1.05e-180   \\
+\textbf{Time:}             &     22:16:44     & \textbf{  Log-Likelihood:    } &   -2816.2   \\
+\textbf{No. Observations:} &         261      & \textbf{  AIC:               } &     5636.   \\
+\textbf{Df Residuals:}     &         259      & \textbf{  BIC:               } &     5644.   \\
+\textbf{Df Model:}         &           1      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                   & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{Intercept} &    2004.0414  &      796.786     &     2.515  &         0.013        &       435.037  3573.046       \\
+\textbf{$solve\_l1$}  &       0.8586  &        0.011     &    77.142  &         0.000        &         0.837     0.881       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 74.396 & \textbf{  Durbin-Watson:     } &     2.390  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &   869.448  \\
+\textbf{Skew:}          &  0.739 & \textbf{  Prob(JB):          } & 1.59e-189  \\
+\textbf{Kurtosis:}      & 11.818 & \textbf{  Cond. No.          } &  7.82e+04  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+The fitting figure:
+
+\begin{figure}[h]
+
+\centering
+
+\subfigure[Autoregression fitting]{\includegraphics[width=0.49\linewidth]{ar1.png}}
+\subfigure[Log scale]{\includegraphics[width=0.49\linewidth]{ar1-log.png}}
+ 
+\end{figure}
+
+The figure looks not very nice since the piecewise pattern occurs again.
+
+\subsection{Detecting effect of difficulty}
+
+Maybe it was putting cart before horse. My initialization idea is to try to design probility model that has more 
+realistic meaning and then to simplify it to a OLS or other model. But I found it is easily achived in time series like model,
+althougn it has lack of interpretability. \footnote{The mysterious word \textit{force} may lead to a moving 
+story that call for deep thought, I prefer to act as crowds standing in front of nude King instead of the honest child.}
+
+I set dummy variable $hard$ that take 1 if the difficulty index of corresponding problem is greater than 30 
+otherwise it take 0.
+
+\[
+solve_i = \beta_0 + \beta_1 solve_{i-1} + \beta_2 hard \, solve_{i-1} + \epsilon_i
+\]
+
+The result is:
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.961   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.961   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     3190.   \\
+\textbf{Date:}              & Fri, 12 May 2017 & \textbf{  Prob (F-statistic):} & 1.13e-182   \\
+\textbf{Time:}              &     23:06:33     & \textbf{  Log-Likelihood:    } &   -2807.0   \\
+\textbf{No. Observations:}  &         261      & \textbf{  AIC:               } &     5620.   \\
+\textbf{Df Residuals:}      &         258      & \textbf{  BIC:               } &     5631.   \\
+\textbf{Df Model:}          &           2      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{Intercept}          &    3928.8190  &      888.898     &     4.420  &         0.000        &      2178.399  5679.239       \\
+\textbf{solve\_l1}           &       0.8508  &        0.011     &    77.956  &         0.000        &         0.829     0.872       \\
+\textbf{hard  solve\_l1} &      -0.8225  &        0.189     &    -4.345  &         0.000        &        -1.195    -0.450       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 75.418 & \textbf{  Durbin-Watson:     } &     2.343  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &  1059.431  \\
+\textbf{Skew:}          &  0.688 & \textbf{  Prob(JB):          } & 8.86e-231  \\
+\textbf{Kurtosis:}      & 12.774 & \textbf{  Cond. No.          } &  9.01e+04  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+Does a hard problem decrease "keep rate" from $85.08\%$ to $2.82\%$ actually? Since the first "hard" problem appear
+82th location. The fact is hidden in detailed tail figure:
+
+\includegraphics[scale=0.55]{tail.png}
+
+Well, it show a good reason why a standard AR model don't have a intercept term. Let's drop the intercept term and
+regress it.
+
+\[
+solve_i = \beta_1 solve_{i-1} + \epsilon_i
+\]
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &      solve       & \textbf{  R-squared:         } &     0.965   \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.965   \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     7133.   \\
+\textbf{Date:}             & Fri, 12 May 2017 & \textbf{  Prob (F-statistic):} & 5.01e-191   \\
+\textbf{Time:}             &     23:44:00     & \textbf{  Log-Likelihood:    } &   -2819.4   \\
+\textbf{No. Observations:} &         261      & \textbf{  AIC:               } &     5641.   \\
+\textbf{Df Residuals:}     &         260      & \textbf{  BIC:               } &     5644.   \\
+\textbf{Df Model:}         &           1      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                  & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1} &       0.8698  &        0.010     &    84.458  &         0.000        &         0.850     0.890       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 62.426 & \textbf{  Durbin-Watson:     } &     2.362  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &   945.115  \\
+\textbf{Skew:}          &  0.399 & \textbf{  Prob(JB):          } & 5.90e-206  \\
+\textbf{Kurtosis:}      & 12.288 & \textbf{  Cond. No.          } &      1.00  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
 
 
-\section{Detecting effect of difficulty}
+It seems very like to original model.
 
-Maybe it was putting cart before horse. My initialization idea tend to design probility model and reduce it to 
-OLS or other model
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 hard \, solve_{i-1} + \epsilon_i
+\]
 
-\section{Motivation}
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.966   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.965   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     3634.   \\
+\textbf{Date:}              & Fri, 12 May 2017 & \textbf{  Prob (F-statistic):} & 3.17e-190   \\
+\textbf{Time:}              &     23:42:11     & \textbf{  Log-Likelihood:    } &   -2816.6   \\
+\textbf{No. Observations:}  &         261      & \textbf{  AIC:               } &     5637.   \\
+\textbf{Df Residuals:}      &         259      & \textbf{  BIC:               } &     5644.   \\
+\textbf{Df Model:}          &           2      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}           &       0.8713  &        0.010     &    85.207  &         0.000        &         0.851     0.891       \\
+\textbf{diff\_hard:solve\_l1} &      -0.4055  &        0.170     &    -2.387  &         0.018        &        -0.740    -0.071       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 61.517 & \textbf{  Durbin-Watson:     } &     2.290  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &  1185.953  \\
+\textbf{Skew:}          &  0.215 & \textbf{  Prob(JB):          } & 2.98e-258  \\
+\textbf{Kurtosis:}      & 13.434 & \textbf{  Cond. No.          } &      16.6  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
 
-Motivation content.
+Ok, this one seems better than the model with intercept. The "hard" problem only decrease "keep rate" 
+from $87.13\%$ to $46.57\%$.
+
+\subsection{Dectecting skip effect}
+
+\subsection{Dectecting phase effect}
+
+We would like to see the later problem tend to face to buru solver, so the difficulty effect will decrease.
+
+\section{Conclusion}
+
+Conclusion content.
 
 \end{document}
