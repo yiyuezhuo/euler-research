@@ -13,7 +13,7 @@
 \DeclareMathOperator{\E}{\mathbb{E}}
 
 \title{The User Behavior On Online Judge Website}
-\author{yueyi zhuo}
+\author{yueyi zhuo (2014060843)}
 %\institute{School of Mathematical,Sichuan Normal University}
 \date{2017}
 
@@ -23,7 +23,8 @@
 
 \begin{abstract}
 
-Abstract content.
+In this paper, I develope two types of model to investigate Online Judge website solve record 
+and verify some factor holded by order, solver and problem difficulty structure.
 
 \end{abstract}
 
@@ -294,7 +295,7 @@ to multicolinearity. The data broke my ambition cruely. \footnote{I write the pa
 I found some result that is beyond my expectations. Since the the value of the paper is very limit and cost is too high
 (you see, my English is not very well), I will not pay more time to rewrite something.}
 
-\section{The time series view}
+\section{The time series like model}
 
 Considering $S_j$ as time series looks little strange, since obviousily we are dealing a snapshot or cross section 
 datathat can be observed many times in principe \footnote{In fact, because data I used is scraped in 2016 
@@ -448,7 +449,7 @@ solve_i = \beta_1 solve_{i-1} + \epsilon_i
 \end{center}
 
 
-It seems very like to original model.
+It seems very like to original model. 
 
 \[
 solve_i = \beta_1 solve_{i-1} + \beta_2 hard_i \, solve_{i-1} + \epsilon_i
@@ -484,6 +485,10 @@ solve_i = \beta_1 solve_{i-1} + \beta_2 hard_i \, solve_{i-1} + \epsilon_i
 %\caption{OLS Regression Results}
 \end{center}
 
+The fitting figure is:
+
+\includegraphics[scale=0.55]{tail2.png}
+
 Ok, this one seems better than the model with intercept. The "hard" problem only decrease "keep rate" 
 from $87.13\%$ to $46.57\%$.
 
@@ -492,7 +497,7 @@ from $87.13\%$ to $46.57\%$.
 If a solver encounter a hard problem that he can't solve, he may drop the website or wait to time that he can
 solve it, that is what above model want to match. But we can consider another behavior in which solver will
 try to skip the problem and to solve the next one. If the hard problem is \textit{isolated}, we can expect
-the decrease shock caused by the problem will be compressd. For match this, I specify the 2 lag item:
+the decrease shock caused by the problem will be compressd. For match this, I try to specify the more lag item:
 
 \[
 solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 hard_i \, solve_{i-1} + \epsilon_i
@@ -722,17 +727,61 @@ The dummy variable $left_i$ take 1 if the ith problem is in second half part.
 \end{center}
 
 So we can confirm that it is true that solver try to solve latter problem has more steady belief.
-The dummy variable method can't be used futher since the condition number has implies the rise of multicolinearity.
- 
+The dummy variable method can't be used futher since the condition number has implies the rise of multicolinearity,
+thus we get a unsignicant result. But if I replace dummy variable $hard$ to original fake quantity $diff$ variable,
+replace $right$ to original order variable $id$, we can get a signicant result:
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 solve_{i-3} + \beta_4 diff \, solve_{i-1} +
+		  \beta_5 diff \, id \, solve_{i-1} + \epsilon_i
+\]
+
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}    &      solve       & \textbf{  R-squared:         } &     0.970   \\
+\textbf{Model:}            &       OLS        & \textbf{  Adj. R-squared:    } &     0.969   \\
+\textbf{Method:}           &  Least Squares   & \textbf{  F-statistic:       } &     1619.   \\
+\textbf{Date:}             & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 2.34e-190   \\
+\textbf{Time:}             &     14:47:52     & \textbf{  Log-Likelihood:    } &   -2737.6   \\
+\textbf{No. Observations:} &         259      & \textbf{  AIC:               } &     5485.   \\
+\textbf{Df Residuals:}     &         254      & \textbf{  BIC:               } &     5503.   \\
+\textbf{Df Model:}         &           5      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                          & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}         &       0.7618  &        0.068     &    11.162  &         0.000        &         0.627     0.896       \\
+\textbf{solve\_l2}         &       0.1196  &        0.062     &     1.931  &         0.055        &        -0.002     0.242       \\
+\textbf{solve\_l3}         &       0.1470  &        0.045     &     3.245  &         0.001        &         0.058     0.236       \\
+\textbf{solve\_l1:diff}    &      -0.0302  &        0.008     &    -3.921  &         0.000        &        -0.045    -0.015       \\
+\textbf{solve\_l1:diff:id} &       0.0001  &     5.47e-05     &     2.705  &         0.007        &      4.02e-05     0.000       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 98.904 & \textbf{  Durbin-Watson:     } &     2.245  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &  1333.652  \\
+\textbf{Skew:}          &  1.107 & \textbf{  Prob(JB):          } & 2.52e-290  \\
+\textbf{Kurtosis:}      & 13.894 & \textbf{  Cond. No.          } &  4.16e+03  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+This imply a continual decline of effect of difficulty shock.
 
 \section{Conclusion}
 
-I have build a more realistic probility model and fail to extend it as you see. 
+I have built a more realistic probility model and fail to extend it as you see. 
 Then I develope a indirect time series like model to verify some hypothesis. I can draw conclusion from these survey:
 
 1. Difficulty shock exists significance but it has not memory 
+
 2. The boru solver seems stable more than raw solver when they encounter hard problem.
 
-
+From result, I can point out that OJ website should place their difficulty problem into proper(latter)
+ location to match solver structure to maximize their business and activity.
 
 \end{document}
