@@ -451,7 +451,7 @@ solve_i = \beta_1 solve_{i-1} + \epsilon_i
 It seems very like to original model.
 
 \[
-solve_i = \beta_1 solve_{i-1} + \beta_2 hard \, solve_{i-1} + \epsilon_i
+solve_i = \beta_1 solve_{i-1} + \beta_2 hard_i \, solve_{i-1} + \epsilon_i
 \]
 
 \begin{center}
@@ -489,12 +489,250 @@ from $87.13\%$ to $46.57\%$.
 
 \subsection{Dectecting skip effect}
 
+If a solver encounter a hard problem that he can't solve, he may drop the website or wait to time that he can
+solve it, that is what above model want to match. But we can consider another behavior in which solver will
+try to skip the problem and to solve the next one. If the hard problem is \textit{isolated}, we can expect
+the decrease shock caused by the problem will be compressd. For match this, I specify the 2 lag item:
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 hard_i \, solve_{i-1} + \epsilon_i
+\]
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.961   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.960   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     2099.   \\
+\textbf{Date:}              & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 2.30e-180   \\
+\textbf{Time:}              &     09:37:24     & \textbf{  Log-Likelihood:    } &   -2797.0   \\
+\textbf{No. Observations:}  &         260      & \textbf{  AIC:               } &     5600.   \\
+\textbf{Df Residuals:}      &         257      & \textbf{  BIC:               } &     5611.   \\
+\textbf{Df Model:}          &           3      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}           &       0.6957  &        0.060     &    11.564  &         0.000        &         0.577     0.814       \\
+\textbf{solve\_l2}           &       0.1718  &        0.053     &     3.230  &         0.001        &         0.067     0.277       \\
+\textbf{diff\_hard:solve\_l1} &      -0.3490  &        0.166     &    -2.101  &         0.037        &        -0.676    -0.022       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 76.644 & \textbf{  Durbin-Watson:     } &    2.015  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } & 2966.655  \\
+\textbf{Skew:}          & -0.202 & \textbf{  Prob(JB):          } &     0.00  \\
+\textbf{Kurtosis:}      & 19.543 & \textbf{  Cond. No.          } &     22.4  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 hard_i \, solve_{i-1} + \beta_4 hard \, solve_{i-2} + \epsilon_i
+\]
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.961   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.960   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     1569.   \\
+\textbf{Date:}              & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 1.03e-178   \\
+\textbf{Time:}              &     09:38:11     & \textbf{  Log-Likelihood:    } &   -2796.8   \\
+\textbf{No. Observations:}  &         260      & \textbf{  AIC:               } &     5602.   \\
+\textbf{Df Residuals:}      &         256      & \textbf{  BIC:               } &     5616.   \\
+\textbf{Df Model:}          &           4      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}           &       0.7014  &        0.061     &    11.406  &         0.000        &         0.580     0.822       \\
+\textbf{solve\_l2}           &       0.1667  &        0.054     &     3.064  &         0.002        &         0.060     0.274       \\
+\textbf{diff\_hard:solve\_l1} &      -0.4368  &        0.253     &    -1.727  &         0.085        &        -0.935     0.061       \\
+\textbf{diff\_hard:solve\_l2} &       0.1235  &        0.268     &     0.461  &         0.645        &        -0.405     0.652       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 75.816 & \textbf{  Durbin-Watson:     } &    2.022  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } & 2893.093  \\
+\textbf{Skew:}          & -0.178 & \textbf{  Prob(JB):          } &     0.00  \\
+\textbf{Kurtosis:}      & 19.338 & \textbf{  Cond. No.          } &     46.5  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 solve_{i-3} + \beta_4 hard_i \, solve_{i-1} + \epsilon_i
+\]
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.968   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.967   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     1910.   \\
+\textbf{Date:}              & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 1.06e-188   \\
+\textbf{Time:}              &     09:52:21     & \textbf{  Log-Likelihood:    } &   -2745.4   \\
+\textbf{No. Observations:}  &         259      & \textbf{  AIC:               } &     5499.   \\
+\textbf{Df Residuals:}      &         255      & \textbf{  BIC:               } &     5513.   \\
+\textbf{Df Model:}          &           4      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}           &       0.5798  &        0.054     &    10.823  &         0.000        &         0.474     0.685       \\
+\textbf{solve\_l2}           &       0.1711  &        0.062     &     2.741  &         0.007        &         0.048     0.294       \\
+\textbf{solve\_l3}           &       0.1300  &        0.046     &     2.809  &         0.005        &         0.039     0.221       \\
+\textbf{diff\_hard:solve\_l1} &      -0.3202  &        0.142     &    -2.247  &         0.025        &        -0.601    -0.040       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 94.148 & \textbf{  Durbin-Watson:     } &     2.375  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &  1219.969  \\
+\textbf{Skew:}          &  1.042 & \textbf{  Prob(JB):          } & 1.22e-265  \\
+\textbf{Kurtosis:}      & 13.426 & \textbf{  Cond. No.          } &      26.1  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 solve_{i-3} + \beta_4 solve_{i-4} + \beta_5 hard_i \, solve_{i-1} + \epsilon_i
+\]
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}     &      solve       & \textbf{  R-squared:         } &     0.973   \\
+\textbf{Model:}             &       OLS        & \textbf{  Adj. R-squared:    } &     0.972   \\
+\textbf{Method:}            &  Least Squares   & \textbf{  F-statistic:       } &     1820.   \\
+\textbf{Date:}              & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 4.90e-196   \\
+\textbf{Time:}              &     09:52:27     & \textbf{  Log-Likelihood:    } &   -2697.7   \\
+\textbf{No. Observations:}  &         258      & \textbf{  AIC:               } &     5405.   \\
+\textbf{Df Residuals:}      &         253      & \textbf{  BIC:               } &     5423.   \\
+\textbf{Df Model:}          &           5      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                            & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}           &       0.3339  &        0.055     &     6.110  &         0.000        &         0.226     0.442       \\
+\textbf{solve\_l2}           &       0.2081  &        0.055     &     3.776  &         0.000        &         0.100     0.317       \\
+\textbf{solve\_l3}           &       0.0363  &        0.055     &     0.660  &         0.510        &        -0.072     0.145       \\
+\textbf{solve\_l4}           &       0.2581  &        0.041     &     6.323  &         0.000        &         0.178     0.338       \\
+\textbf{diff\_hard:solve\_l1} &      -0.2193  &        0.124     &    -1.767  &         0.079        &        -0.464     0.025       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 135.383 & \textbf{  Durbin-Watson:     } &    2.179  \\
+\textbf{Prob(Omnibus):} &   0.000 & \textbf{  Jarque-Bera (JB):  } & 1713.428  \\
+\textbf{Skew:}          &   1.761 & \textbf{  Prob(JB):          } &     0.00  \\
+\textbf{Kurtosis:}      &  15.123 & \textbf{  Cond. No.          } &     29.1  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+
+To compare the four models, we can see the difficulty shock only exists one period (So solver can't
+recall the hell except that is the last problem he try to solve.). And there's significance skip effect, I prefer
+to choose the model 3 as real model, hence we can get the average transition diagram
+from the estimated parameters to illustrate this:
+
+\[
+\begin{array}{c|ccccccc}
+\mathrm{Hard} & 1 & 2& 3 & 4 & 5 & 6 &7 \\
+\hline
+\mathrm{EEEE} & 10000 & 9500 & 9000 & 8593 & 8164 & 7749 & 7386 \\
+\mathrm{EEEH} & 10000 & 9500 & 9000 & 8593 & 8164 & 7749 & 4905 \\
+\mathrm{EEHE} & 10000 & 9500 & 9000 & 8593 & 8164 & 5135 & 7046 \\
+\mathrm{EEHH} & 10000 & 9500 & 9000 & 8593 & 8164 & 5135 & 5402 \\
+\mathrm{EHEE} & 10000 & 9500 & 9000 & 8593 & 5413 & 7392 & 6869 \\
+\mathrm{EHEH} & 10000 & 9500 & 9000 & 8593 & 5413 & 7392 & 4502 \\
+\mathrm{EHHE} & 10000 & 9500 & 9000 & 8593 & 5413 & 5658 & 6644 \\
+\mathrm{EHHH} & 10000 & 9500 & 9000 & 8593 & 5413 & 5658 & 4832 \\
+\mathrm{HEEE} & 10000 & 9500 & 9000 & 5711 & 7790 & 7208 & 5581 \\
+\mathrm{HEEH} & 10000 & 9500 & 9000 & 5711 & 7790 & 7208 & 3273 \\
+\mathrm{HEHE} & 10000 & 9500 & 9000 & 5711 & 7790 & 4713 & 5257 \\
+\mathrm{HEHH} & 10000 & 9500 & 9000 & 5711 & 7790 & 4713 & 3748 \\
+\mathrm{HHEE} & 10000 & 9500 & 9000 & 5711 & 5961 & 6970 & 5237 \\
+\mathrm{HHEH} & 10000 & 9500 & 9000 & 5711 & 5961 & 6970 & 3006 \\
+\mathrm{HHHE} & 10000 & 9500 & 9000 & 5711 & 5961 & 5061 & 4989 \\
+\mathrm{HHHH} & 10000 & 9500 & 9000 & 5711 & 5961 & 5061 & 3369 \\
+\end{array}
+\]
+
+The $\mathrm{H}$ means that the corresponding problem is "hard", the $\mathrm{E}$ means that the corresponding
+problem is not "hard". We can observe the obvious skip effect at all.
+
+
 \subsection{Dectecting phase effect}
 
-We would like to see the later problem tend to face to buru solver, so the difficulty effect will decrease.
+We would like to see the later problem tend to facing buru solver, so the difficulty effect will decrease.
+
+I use dummy variable like above discussion again, even thougn a countinuous decrease tendency is expected,
+but I can't see a method that can transform it to a linear model easily.
+
+The model specification is:
+
+\[
+solve_i = \beta_1 solve_{i-1} + \beta_2 solve_{i-2} + \beta_3 solve_{i-3} + \beta_4 hard \, solve_{i-1} +
+		  \beta_5 hard_i \, right_i \, solve_{i-1} + \epsilon_i
+\]
+
+The dummy variable $left_i$ take 1 if the ith problem is in second half part.
+
+\begin{center}
+\begin{tabular}{lclc}
+\toprule
+\textbf{Dep. Variable:}           &      solve       & \textbf{  R-squared:         } &     0.968   \\
+\textbf{Model:}                   &       OLS        & \textbf{  Adj. R-squared:    } &     0.967   \\
+\textbf{Method:}                  &  Least Squares   & \textbf{  F-statistic:       } &     1523.   \\
+\textbf{Date:}                    & Sat, 13 May 2017 & \textbf{  Prob (F-statistic):} & 4.62e-187   \\
+\textbf{Time:}                    &     14:03:17     & \textbf{  Log-Likelihood:    } &   -2745.3   \\
+\textbf{No. Observations:}        &         259      & \textbf{  AIC:               } &     5501.   \\
+\textbf{Df Residuals:}            &         254      & \textbf{  BIC:               } &     5518.   \\
+\textbf{Df Model:}                &           5      & \textbf{                     } &             \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lccccc}
+                                  & \textbf{coef} & \textbf{std err} & \textbf{t} & \textbf{P$>$$|$t$|$} & \textbf{[95.0\% Conf. Int.]}  \\
+\midrule
+\textbf{solve\_l1}                 &       0.5800  &        0.054     &    10.808  &         0.000        &         0.474     0.686       \\
+\textbf{solve\_l2}                 &       0.1706  &        0.063     &     2.728  &         0.007        &         0.047     0.294       \\
+\textbf{solve\_l3}                 &       0.1303  &        0.046     &     2.809  &         0.005        &         0.039     0.222       \\
+\textbf{diff\_hard:solve\_l1}       &      -0.3482  &        0.163     &    -2.131  &         0.034        &        -0.670    -0.026       \\
+\textbf{diff\_hard:solve\_l1:right} &       0.1162  &        0.329     &     0.353  &         0.725        &        -0.532     0.765       \\
+\bottomrule
+\end{tabular}
+\begin{tabular}{lclc}
+\textbf{Omnibus:}       & 94.967 & \textbf{  Durbin-Watson:     } &     2.375  \\
+\textbf{Prob(Omnibus):} &  0.000 & \textbf{  Jarque-Bera (JB):  } &  1216.730  \\
+\textbf{Skew:}          &  1.059 & \textbf{  Prob(JB):          } & 6.17e-265  \\
+\textbf{Kurtosis:}      & 13.405 & \textbf{  Cond. No.          } &      62.1  \\
+\bottomrule
+\end{tabular}
+%\caption{OLS Regression Results}
+\end{center}
+
+So we can confirm that it is true that solver try to solve latter problem has more steady belief.
+The dummy variable method can't be used futher since the condition number has implies the rise of multicolinearity.
+ 
 
 \section{Conclusion}
 
-Conclusion content.
+I have build a more realistic probility model and fail to extend it as you see. 
+Then I develope a indirect time series like model to verify some hypothesis. I can draw conclusion from these survey:
+
+1. Difficulty shock exists significance but it has not memory 
+2. The boru solver seems stable more than raw solver when they encounter hard problem.
+
+
 
 \end{document}
